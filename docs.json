@@ -3,7 +3,9 @@
   "theme": "mint",
   "name": "ReqSquared",
   "colors": {
-    "primary": "#4472C4"
+    "primary": "#4472C4",
+    "light": "#84B4E0",
+    "dark": "#4A4A4A"
   },
   "navigation": {
     "tabs": [
@@ -17,5 +19,14 @@
         ]
       }
     ]
+  },
+  "logo": {
+    "light": "/images/Req2LogoRounded.png",
+    "dark": "/images/Req2LogoRounded_White.png"
+  },
+  "background": {
+    "color": {
+      "dark": "#4A4A4A"
+    }
   }
 }
