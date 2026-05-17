@@ -26,8 +26,8 @@
     ]
   },
   "logo": {
-    "light": "/images/Req2LogoRounded.png",
-    "dark": "/images/Req2LogoRounded_White.png",
+    "light": "/images/logo_req_squared_blue_1.png",
+    "dark": "/images/logo_req_squared_grey_1.png",
     "href": "https://reqsquared.com"
   },
   "background": {
@@ -35,5 +35,18 @@
       "dark": "#4A4A4A"
     }
   },
-  "favicon": "/images/Req2LogoRounded.png"
+  "favicon": {
+    "light": "/images/Req2LogoRounded.png",
+    "dark": "/images/Req2LogoRounded.png"
+  },
+  "styling": {
+    "latex": true
+  },
+  "errors": {
+    "404": {
+      "redirect": true,
+      "title": "Page not found.",
+      "description": "What's your vector victor?"
+    }
+  }
 }
