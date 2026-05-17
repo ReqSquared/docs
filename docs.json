@@ -10,7 +10,7 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "The BlueCube Methodology",
         "groups": [
           {
             "group": "Getting Started",
@@ -20,7 +20,22 @@
           }
         ],
         "pages": [
-          "introduction"
+          "introduction",
+          {
+            "group": "Cubes",
+            "pages": [
+              "load-balancing",
+              "headcount-optimization",
+              {
+                "group": "Load Balancing",
+                "pages": [
+                  "introduction-1",
+                  "k-means",
+                  "frontier-efficiency-dea"
+                ]
+              }
+            ]
+          }
         ]
       }
     ]
