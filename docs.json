@@ -32,7 +32,7 @@
   },
   "background": {
     "color": {
-      "dark": "#4A4A4A"
+      "dark": "#000000"
     }
   },
   "favicon": {
@@ -48,5 +48,8 @@
       "title": "Page not found.",
       "description": "What's your vector victor?"
     }
+  },
+  "navbar": {
+    "links": []
   }
 }
