@@ -10,7 +10,7 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "The BlueCube Methodology",
+        "tab": "BlueCubes",
         "groups": [
           {
             "group": "Getting Started",
@@ -45,6 +45,12 @@
               }
             ]
           }
+        ]
+      },
+      {
+        "tab": "RequisitionIQ",
+        "pages": [
+          "introduction-3"
         ]
       }
     ]
