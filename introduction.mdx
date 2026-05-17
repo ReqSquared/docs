@@ -1,3 +1,52 @@
 ---
 title: "Introduction"
 ---
+
+BlueCube is the methodology framework for Talent Acquisition decision intelligence, built on composable analytical primitives that produce explainable Health Scores on every requisition.
+
+## Step 1: One BlueCube
+
+A BlueCube is the analytical primitive of the methodology. One cube. One job. Inspectable from end to end.
+
+<img
+  src="/images/step_1_blue_cube_abstract_2.png"
+  alt="Step 1 Blue Cube Abstract 2"
+  title="Step 1 Blue Cube Abstract 2"
+  style={{ width:"74%" }}
+/>
+
+Every Cube takes two inputs, runs a model, and produces three outputs. \
+That's the whole shape.
+
+### The Two Inputs
+
+<Steps>
+  <Step title="Input">
+    The raw material the cube operates on. A dataset. A set of records. Whatever the cube is analyzing.
+  </Step>
+  <Step title="TA Context">
+    What makes the BlueCube the BlueCube. Domain knowledge in structured form — peer group definitions, severity thresholds, role classifications, whatever the analytical work requires. TA Context is configuration. It can be a spreadsheet, a YAML file, or the output of another cube.
+  </Step>
+</Steps>
+
+Without TA Context, the cube is a generic analytical method running against generic data. With TA Context, the cube becomes the TA-specific analytical work the methodology is authoring.
+
+### The Model
+
+The Model is what the cube does. Linear regression. KNN classification. KMeans clustering. DEA frontier analysis. Z-score peer benchmarking. Whatever method the cube's analytical work calls for.
+
+The Model is open. A cube can use any method that produces defensible output against the inputs. The methodology doesn't prescribe a single method per cube — it specifies what comes in, what comes out, and that the work in between is documented.
+
+### The Three Outputs
+
+<Steps>
+  <Step title="Data">
+    The dataframe. Per-row outputs from the model. Cluster labels, predictions, distances, classifications. The structured analytical result.
+  </Step>
+  <Step title="Decision">
+    The operational signal derived from the data. The Health Score contribution. The flag. The recommendation. The thing a TA operator can act on.
+  </Step>
+  <Step title="Explainability">
+    Plain English narrative explaining what the cube produced and why. Multi-run consensus counts. Confidence rates. The reason this requisition scored what it scored.
+  </Step>
+</Steps>
