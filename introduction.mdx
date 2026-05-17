@@ -2,8 +2,6 @@
 title: "Introduction"
 ---
 
-
-
 BlueCube is the methodology framework for Talent Acquisition decision intelligence, built on composable analytical primitives that produce explainable Health Scores on every requisition.
 
 ## Step 1: One BlueCube
@@ -56,13 +54,13 @@ The Model is open. A cube can use any method that produces defensible output aga
 Every BlueCube produces the same three outputs, every time:
 
 <Steps>
-  <Step title="Data" stepNumber={4}>
+  <Step title="Data" stepNumber={3}>
     The dataframe. Per-row outputs from the model. Cluster labels, predictions, distances, classifications. The structured analytical result.
   </Step>
-  <Step title="Decision" stepNumber={5}>
+  <Step title="Decision" stepNumber={4}>
     The operational signal derived from the data. The Health Score contribution. The flag. The recommendation. The thing a TA operator can act on.
   </Step>
-  <Step title="Explainability" stepNumber={6}>
+  <Step title="Explainability" stepNumber={5}>
     Plain English narrative explaining what the cube produced and why. Multi-run consensus counts. Confidence rates. The reason this requisition scored what it scored.
   </Step>
 </Steps>
@@ -100,7 +98,7 @@ Three cubes wired together produce the full Air Traffic Controller for Open Requ
     The Headcount Optimization cube's output becomes the Input that the Load Balancing cube consumes. Cubes connect through their structured outputs.
   </Accordion>
 
-  <Accordion title="Decisions flows forward.">
+  <Accordion title="Decisions flow forward.">
     The Load Balancing cube's output becomes a Decision input that the Open Requisitions cube consumes. The composition stacks.
   </Accordion>
 
