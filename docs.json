@@ -24,14 +24,23 @@
           {
             "group": "Cubes",
             "pages": [
-              "load-balancing",
-              "headcount-optimization",
               {
-                "group": "Load Balancing",
+                "group": "Open Req Load Balancing",
                 "pages": [
                   "introduction-1",
                   "k-means",
                   "frontier-efficiency-dea"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Decision Systems",
+            "pages": [
+              {
+                "group": "Air Traffic Controller (Open Reqs)",
+                "pages": [
+                  "introduction-2"
                 ]
               }
             ]
