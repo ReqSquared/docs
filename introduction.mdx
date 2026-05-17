@@ -9,10 +9,22 @@ BlueCube is the methodology framework for Talent Acquisition decision intelligen
 A BlueCube is the analytical primitive of the methodology. One cube. One job. Inspectable from end to end.
 
 <img
-  src="/images/step_1_blue_cube_abstract_2.png"
+  src="/images/step_1_blue_cube_abstract_3.png"
   alt="Step 1 Blue Cube Abstract 2"
   title="Step 1 Blue Cube Abstract 2"
   style={{ width:"74%" }}
+  lightAlt="Step 1 Blue Cube Abstract 2"
+  darkAlt="Step 1 Blue Cube Abstract 2"
+  className="dark:hidden"
+/>
+<img
+  src="images/step_1_blue_cube_abstract_3.png"
+  alt="Step 1 Blue Cube Abstract 2"
+  title="Step 1 Blue Cube Abstract 2"
+  style={{ width:"74%" }}
+  lightAlt="Step 1 Blue Cube Abstract 2"
+  darkAlt="Step 1 Blue Cube Abstract 2"
+  className="hidden dark:block"
 />
 
 Every Cube takes two inputs, runs a model, and produces three outputs. \
@@ -39,14 +51,125 @@ The Model is open. A cube can use any method that produces defensible output aga
 
 ### The Three Outputs
 
+Every BlueCube produces the same three outputs, every time:
+
 <Steps>
-  <Step title="Data">
+  <Step title="Data" stepNumber={4}>
     The dataframe. Per-row outputs from the model. Cluster labels, predictions, distances, classifications. The structured analytical result.
   </Step>
-  <Step title="Decision">
+  <Step title="Decision" stepNumber={5}>
     The operational signal derived from the data. The Health Score contribution. The flag. The recommendation. The thing a TA operator can act on.
   </Step>
-  <Step title="Explainability">
+  <Step title="Explainability" stepNumber={6}>
     Plain English narrative explaining what the cube produced and why. Multi-run consensus counts. Confidence rates. The reason this requisition scored what it scored.
   </Step>
 </Steps>
+
+The three outputs are the cube's contract. Anything consuming a BlueCube knows it will receive a dataframe, a decision, and an explainability output. Always. Same shape across every cube.
+
+### Why the Cube Matters
+
+A black box produces an output and asks the consumer to trust it. The methodology underneath isn't visible. The reasoning isn't legible. The user has to decide whether to trust an opaque system.
+
+A BlueCube produces an output and shows its work. The data is inspectable. The decision is documented. The explainability surfaces the methodology underneath. The user trusts the output because the output earns trust by exposing how it was produced.
+
+That's the whole commitment. Every cube. Every output. Every time.
+
+**It's a BlueCube, not a Black Box.**
+
+## Step 2: Two Cubes
+
+![Blue Cube Wiring2](/images/blue_cube_wiring2.png)
+
+## Step 3: Putting It All Together
+
+### Air Traffic Controller for Opening Requisitions
+
+Two cubes upstream. One cube downstream. The Air Traffic Controller composes the methodology into a Health Score on every open requisition.
+
+The Headcount cube produces workforce composition signal. The Requisition Load Balancing cube produces recruiter-to-req ratio signal. The Open Reqs Air Traffic Controller cube consumes both, applies its own TA Context, and produces the Health Score that lands on the requisition record.
+
+That's the full wiring:
+
+```mermaid
+graph LR
+    RAW_A["<b>Raw Data</b><br/>HEADCOUNT<br/>FULLY LOADED COST<br/>LOCATION"]
+    TC_A["<b>TA Context</b><br/>PERFORMANCE<br/>CAPABILITY"]
+    
+    CUBE_A["<b>TA HEADCOUNT</b><br/><b>MODEL HC1.2</b>"]
+    
+    DF_A["<b>Dataframe</b><br/>TA_HC_OPTIMIZATION"]
+    
+    RAW_B["<b>Raw Data</b><br/>OPEN REQS"]
+    TC_B["<b>TA Context</b><br/>PRIORITY"]
+    
+    CUBE_B["<b>OPEN REQUISITION</b><br/><b>MODEL R1.5</b>"]
+    
+    DF_B["<b>Dataframe</b><br/>TA_OPEN_REQ_LOAD_BALANCING"]
+    
+    TC_C["<b>TA Context</b><br/>SEVERITY THRESHOLDS<br/>COMPOSITION WEIGHTS"]
+    
+    CUBE_C["<b>OPEN REQS</b><br/><b>AIR TRAFFIC CONTROLLER</b><br/><b>ATC1.0</b>"]
+    
+    DF_C["<b>Dataframe</b><br/>PER_REQ_HEALTH_SCORE"]
+    DEC_C["<b>Decision</b><br/>HEALTH SCORE<br/>+ SEVERITY BUCKET"]
+    EXP_C["<b>Explainability</b><br/>STACKED SIGNAL NARRATIVE"]
+    
+    RAW_A -.-> CUBE_A
+    TC_A -.-> CUBE_A
+    CUBE_A -.-> DF_A
+    
+    RAW_B -.-> CUBE_B
+    TC_B -.-> CUBE_B
+    CUBE_B -.-> DF_B
+    
+    DF_A --> CUBE_C
+    DF_B --> CUBE_C
+    TC_C -.-> CUBE_C
+    
+    CUBE_C -.-> DF_C
+    CUBE_C -.-> DEC_C
+    CUBE_C -.-> EXP_C
+    
+    classDef cube fill:#EEF3FC,stroke:#4F7BD9,stroke-width:2.5px,color:#1F3A8A,font-weight:bold
+    classDef label fill:#FFFFFF,stroke:#FFFFFF,color:#1F3A8A
+    classDef finalOutput fill:#FFFFFF,stroke:#4F7BD9,stroke-width:1.5px,color:#1F3A8A
+    
+    class CUBE_A,CUBE_B,CUBE_C cube
+    class RAW_A,TC_A,DF_A,RAW_B,TC_B,DF_B,TC_C label
+    class DF_C,DEC_C,EXP_C finalOutput
+    
+    linkStyle default stroke:#9AA0A6,stroke-width:1px
+```
+
+### What the Air Traffic Controller Does
+
+The ATC cube doesn't run a model in the predictive sense. It composes upstream signals with documented weights against the open requisition's attributes.
+
+For each open requisition, the ATC cube:
+
+- Reads the workforce optimization signal from the Headcount cube's dataframe output
+- Reads the recruiter capacity signal from the Load Balancing cube's dataframe output
+- Applies severity thresholds and composition weights from its TA Context
+- Produces a Health Score per requisition with severity bucket classification
+- Generates plain English explainability that surfaces which upstream signals contributed
+
+The Health Score is the methodology's final operational artifact. It lands as a custom field on the requisition record in any ATS that supports custom fields and CSV import.
+
+### The Three-Output Contract at the Composition Layer
+
+The ATC cube produces the same three outputs as every other BlueCube, just composed from upstream signals:
+
+**Dataframe.** Per-requisition Health Score with full signal decomposition columns — workforce signal contribution, capacity signal contribution, composition weights applied, final score.
+
+**Decision.** The Health Score number plus the severity bucket (normal / watch / monitor / inspect) that operators filter and sort by.
+
+**Explainability.** Plain English narrative explaining the score. _Workforce composition shows favorable signal at 0.8 strength. Recruiter capacity below frontier at 0.4 strength. Combined weighted score: 34. Severity: monitor._
+
+### Why Composition Through Cubes
+
+A monolithic predictive model would produce the same Health Score number without showing its work. The composition through three cubes — Headcount, Load Balancing, ATC — produces the score with full traceability. Every component is inspectable. Every weight is documented. Every signal traces to a specific upstream cube's analytical work.
+
+That's the methodology realized at the composition layer. The Health Score isn't an opinion. It's a documented composition of measurable signals, each defensible on its own, stacked into a single operationally legible field.
+
+**It's a BlueCube, not a Black Box. Composed.**
