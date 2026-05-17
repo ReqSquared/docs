@@ -27,11 +27,13 @@
   },
   "logo": {
     "light": "/images/Req2LogoRounded.png",
-    "dark": "/images/Req2LogoRounded_White.png"
+    "dark": "/images/Req2LogoRounded_White.png",
+    "href": "https://reqsquared.com"
   },
   "background": {
     "color": {
       "dark": "#4A4A4A"
     }
-  }
+  },
+  "favicon": "/images/Req2LogoRounded.png"
 }
