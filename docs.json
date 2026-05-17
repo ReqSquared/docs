@@ -22,10 +22,17 @@
         "pages": [
           "introduction",
           {
-            "group": "Cubes",
+            "group": "BlueCubes",
             "pages": [
               {
-                "group": "Open Req Load Balancing",
+                "group": "Cube #1: Workforce Planning",
+                "pages": [
+                  "untitled-page",
+                  "model-1-linear-regression"
+                ]
+              },
+              {
+                "group": "Cube #2: Load Balancing",
                 "pages": [
                   "introduction-1",
                   "k-means",
