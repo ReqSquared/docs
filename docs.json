@@ -29,7 +29,9 @@
                 "pages": [
                   "introduction-1",
                   "k-means",
-                  "frontier-efficiency-dea"
+                  "frontier-efficiency-dea",
+                  "model-3-z-scores",
+                  "putting-models-together"
                 ]
               }
             ]
