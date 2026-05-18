@@ -1,77 +1,148 @@
 ---
-title: "RequisitionIQ Level 1"
-description: "Peer Group Voting System. Descriptive statistics. Multiple context lenses. Same requisition, different signal."
-sidebarTitle: "Introduction"
+title: "Introduction"
 ---
 
-## Peer Group Voting System
+BlueCube is the methodology framework for Talent Acquisition decision intelligence, built on composable analytical primitives that produce explainable Health Scores on every requisition.
 
-RequisitionIQ Level 1 is the Descriptive System for the requisition lifecycle. It takes one filled requisition and compares it against its peer group across multiple context lenses — recruiter, organization, company — using z-scores, survival percentiles, and company goal thresholds.
+## One BlueCube
 
-The same req gets a different signal depending on which lens you look through. That is the point.
+A BlueCube is the analytical primitive of the methodology. One cube. One job. Inspectable from end to end.
 
-## What Level 1 Is
+<Frame>
+  <img
+    alt="Step 1 Blue Cube Abstract 2"
+    title="Step 1 Blue Cube Abstract 2"
+    style={{ width:"74%" }}
+    lightAlt="Step 1 Blue Cube Abstract 2"
+    darkAlt="Step 1 Blue Cube Abstract 2"
+    src="/images/step_1_blue_cube_abstract_3.png"
+    className="dark:hidden"
+  />
+  <img
+    alt="Step 1 Blue Cube Abstract 2"
+    title="Step 1 Blue Cube Abstract 2"
+    style={{ width:"74%" }}
+    lightAlt="Step 1 Blue Cube Abstract 2"
+    darkAlt="Step 1 Blue Cube Abstract 2"
+    src="images/step_1_blue_cube_abstract_3.png"
+    className="hidden dark:block"
+  />
+</Frame>
 
-Level 1 is **descriptive statistics**. Not predictive. Not prescriptive.
+Every Cube takes two inputs, runs a model, and produces three outputs. \
+That's the whole shape.
 
-The engine produces signals. What you do with them is yours.
-
-A requisition can score *faster than this recruiter's normal* against the recruiter context and *slower than the company* against the company context. Both are true. Both are useful.
-
-## Where Level 1 Sits
-
-Within RequisitionIQ, Level 1 is the foundational layer:
-
-- **Level 1 — Descriptive.** Position relative to peer group. Multiple context lenses. Statistical signals.
-- **Higher Levels — Decision Systems.** Cubes composing into operational outputs. The Air Traffic Controller composition lives in [Decision Systems](/decision-systems/air-traffic-controller).
-
-Level 1 describes where things sit. Decision Systems decide what to do about it.
-
-## The Five-Step Pipeline
-
-The engine runs five steps, top to bottom:
+### The Two Inputs
 
 <Steps>
-  <Step title="Build the observation dataframe">
-    Current quarter reqs tagged with the schema's analytical signals.
+  <Step title="Input">
+    The raw material the cube operates on. A dataset. A set of records. Whatever the cube is analyzing.
   </Step>
-  <Step title="Build sample population dataframes">
-    Prior quarter fills grouped by context lens. Sample size per config `top_n` threshold.
-  </Step>
-  <Step title="Expand observations across context lenses">
-    Each requisition multiplied across every valid groupby combination — recruiter × country × job_group × job_family × job_level and every broader subset.
-  </Step>
-  <Step title="Z-score each observation">
-    Compare each req's metrics against its sample population group's mean and standard deviation.
-  </Step>
-  <Step title="Add survival percentiles">
-    Cumulative distribution position within the sample population group.
+  <Step title="TA Context">
+    What makes the BlueCube the BlueCube. Domain knowledge in structured form — peer group definitions, severity thresholds, role classifications, whatever the analytical work requires. TA Context is configuration. It can be a spreadsheet, a YAML file, or the output of another cube.
   </Step>
 </Steps>
 
-Each step produces a named, inspectable dataframe. Nothing is hidden.
+Without TA Context, the cube is a generic analytical method running against generic data. With TA Context, the cube becomes the TA-specific analytical work the methodology is authoring.
 
-## What Comes Next
+### The Model
 
-Drill into the methodology:
+The Model is what the cube does. Linear regression. KNN classification. KMeans clustering. DEA frontier analysis. Z-score peer benchmarking. Whatever method the cube's analytical work calls for.
 
-<CardGroup cols={2}>
-  <Card title="The Pipeline" icon="layer-group" href="/descriptive-systems/the-pipeline">
-    The five steps in detail. What each one does. What it produces.
-  </Card>
-  <Card title="How Context Works" icon="layer-group" href="/descriptive-systems/how-context-works">
-    Context lens hierarchy. Why the same req scores differently across lenses.
-  </Card>
-  <Card title="Signal System" icon="signal" href="/descriptive-systems/signal-system">
-    Z-score thresholds. Schema-driven signal levels. Direction, floor, ceiling.
-  </Card>
-  <Card title="Worked Example" icon="table" href="/descriptive-systems/worked-example">
-    One requisition. Four metrics. Seven context lenses. The full output.
-  </Card>
-  <Card title="Schemas & Configs" icon="file-code" href="/descriptive-systems/schemas-configs">
-    The YAML that drives the engine. Inspectable. Configurable.
-  </Card>
-  <Card title="Files Reference" icon="folder" href="/descriptive-systems/files-reference">
-    Each Python file and what it does.
-  </Card>
-</CardGroup>
+The Model is open. A cube can use any method that produces defensible output against the inputs. The methodology doesn't prescribe a single method per cube — it specifies what comes in, what comes out, and that the work in between is documented.
+
+### The Three Outputs
+
+Every BlueCube produces the same three outputs, every time:
+
+<Steps>
+  <Step title="Data" stepNumber={3}>
+    The dataframe. Per-row outputs from the model. Cluster labels, predictions, distances, classifications. The structured analytical result.
+  </Step>
+  <Step title="Decision" stepNumber={4}>
+    The operational signal derived from the data. The Health Score contribution. The flag. The recommendation. The thing a TA operator can act on.
+  </Step>
+  <Step title="Explainability" stepNumber={5}>
+    Plain English narrative explaining what the cube produced and why. Multi-run consensus counts. Confidence rates. The reason this requisition scored what it scored.
+  </Step>
+</Steps>
+
+The three outputs are the cube's contract. Anything consuming a BlueCube knows it will receive a dataframe, a decision, and an explainability output. Always. Same shape across every cube.
+
+### Why the BlueCube Matters
+
+A black box produces an output and asks the consumer to trust it. The methodology underneath isn't visible. The reasoning isn't legible. The user has to decide whether to trust an opaque system.
+
+A BlueCube produces an output and shows its work. The data is inspectable. The decision is documented. The explainability surfaces the methodology underneath. The user trusts the output because the output earns trust by exposing how it was produced.
+
+That's the whole commitment. Every cube. Every output. Every time.
+
+**It's a BlueCube, not a Black Box.**
+
+## Putting Cubes Together
+
+### Cubes Compose
+
+A single BlueCube does one analytical job. Composition is where the methodology gets to operational decision support.
+
+Three bespoke cubes wired together below produce the full Air Traffic Controller for Open Requisitions. Each cube does its job. Each cube's output flows into the next cube. The final cube produces the operational Health Score that lands on the open requisition record.
+
+<Frame>
+  <img
+    src="/images/step2_abstract_3_cubes_2.png"
+    alt="Step2 Abstract 3 Cubes 2"
+    title="Step2 Abstract 3 Cubes 2"
+  />
+</Frame>
+
+### What Flows Between Cubes
+
+<AccordionGroup>
+  <Accordion title="TA Context flows in.">
+    The first cube receives its TA Context — performance signals, capability signals, whatever the analytical work requires.
+  </Accordion>
+
+  <Accordion title="Inputs flow forward.">
+    The Workforce Planning cube's output becomes the Input that the Load Balancing cube consumes. Cubes connect through their structured outputs.
+  </Accordion>
+
+  <Accordion title="Decisions flow forward.">
+    The Load Balancing cube's output becomes a Decision input that the Open Requisitions cube consumes. The composition stacks.
+  </Accordion>
+
+  <Accordion title="Explainability flows out.">
+    The final cube produces the explainability artifact that lands in the consumers hands — the ATS custom field, the dashboard, the report, the inbox.
+  </Accordion>
+</AccordionGroup>
+
+### The Composition Pattern
+
+The pattern is consistent across the methodology:
+
+<Callout icon="check">
+  Every cube has the same shape (two inputs, model, three outputs).
+</Callout>
+
+<Callout icon="check">
+  Cubes connect through their structured outputs.
+</Callout>
+
+<Callout icon="check">
+  Composition is documented at every connection.
+</Callout>
+
+<Callout icon="check">
+  The final output traces back through every contributing cube.
+</Callout>
+
+## The Bigger Picture
+
+### Before the Dashboard
+
+Standard Talent Acquisition analytics operates at the descriptive layer. Counts, conversion rates, time-to-fill averages, recruiter productivity by hire volume. Dashboards render the numbers. Operators interpret them. Decisions get made on gut feel plus dashboard glances.
+
+The example Air Traffic Controller for Open Requisitions takes the Headcount Optimization signal, feeds it into the Load Balancer to run req-to-recruiter allocation, and produces per-req explainable recommendations that lands on the requisition record as a custom object.
+
+A dashboard reports out on the BlueCube created field.
+
+**BlueCube** **is before the dashboard**.
