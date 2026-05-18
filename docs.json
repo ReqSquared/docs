@@ -10,7 +10,7 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "BlueCubes",
+        "tab": "Methodology: BlueCubes",
         "groups": [
           {
             "group": "Getting Started",
@@ -22,7 +22,7 @@
         "pages": [
           "introduction",
           {
-            "group": "BlueCubes",
+            "group": "Cubes",
             "pages": [
               {
                 "group": "Cube #1: Workforce Planning",
