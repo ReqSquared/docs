@@ -1,0 +1,131 @@
+---
+title: "Descriptive Systems"
+description: "Peer Group Voting System. Same requisition, different context lens, different signal. The entire thesis."
+---
+
+RequisitionIQ Level 1 is the Descriptive System for the requisition lifecycle. It takes one filled requisition and compares it against its peer group across multiple context lenses — recruiter, organization, company — using z-scores, survival percentiles, and schema-driven thresholds.
+
+The same requisition gets a different signal depending on which lens you look through. That is the point.
+
+Descriptive statistics. Not predictive. Not prescriptive. The engine produces signals. What you do with them is yours.
+
+## The Pipeline
+
+Five steps. Each one produces a named, inspectable dataframe.
+
+<Steps>
+  <Step title="Build the observation dataframe">
+    Current quarter requisitions tagged with the schema's analytical metrics.
+  </Step>
+  <Step title="Build sample population dataframes">
+    Historic completed reqs grouped by context lens. Each lens must meet its configured `top_n` sample threshold to qualify.
+  </Step>
+  <Step title="Expand observations across context lenses">
+    Each observation requisition gets multiplied across every qualifying context lens. One req can produce 7-10 rows in the expanded dataframe — one per lens.
+  </Step>
+  <Step title="Z-score each observation">
+    For each row, compute the z-score against the sample population group's mean and standard deviation.
+  </Step>
+  <Step title="Add survival percentiles">
+    For each row, compute the cumulative distribution position within the sample population group.
+  </Step>
+</Steps>
+
+The observation period and population period are configurable. The default config uses the current quarter as observations and everything prior as the population.
+
+## Context Lenses
+
+Context lenses are defined in the metric config. Each lens group has its own `top_n` sample threshold and a hierarchy of progressively broader groupings.
+
+```yaml
+recruiter_context:
+  top_n: 42
+  lineage_columns:
+    - ["recruiter", "country", "job_group", "job_family", "job_level"]
+    - ["recruiter", "country", "job_group", "job_family"]
+    - ["recruiter", "country", "job_group"]
+    - ["recruiter", "country"]
+    - ["recruiter"]
+```
+
+The most specific lens at the top. The broadest at the bottom. The engine evaluates each lens against the population data. A lens qualifies if the groupby combination produces at least `top_n` records.
+
+Different context groups use different `top_n` thresholds because the analytical question differs. Recruiter context uses 42 — small enough to surface individual recruiter patterns. Country context uses 240 — accounts for the larger population pool. Job group context uses 480 — accounts for the broader cross-organizational comparison.
+
+The number of valid context lenses per requisition varies entirely based on the data meeting the configured thresholds. A senior recruiter in a high-volume function qualifies for every lens in the hierarchy. A new recruiter in a thin-data geography might only qualify for the broadest lenses.
+
+## Lineage Columns
+
+Every dataframe in the pipeline carries `lineage_*` columns that track which context lens each row corresponds to. The columns include:
+
+- `lineage_unique_id` — the composite identifier (`recruiter_VictorAlberts_UK_Tech_Engineering_Entry`) that joins observations to their sample population groups
+- `lineage_cluster_group` — which context group this row belongs to (`recruiter_context`, `country_context`, etc.)
+- `lineage_cluster_group_level` — position in the hierarchy (most specific to broadest)
+- `lineage_target_column` — which metric this row's z-score applies to
+- `lineage_top_n` — the sample threshold that qualified this lens
+
+The lineage convention makes the multi-lens output inspectable. Reader sees a z-score and can trace back to exactly which lens produced it and which peer group it was computed against. Nothing implicit.
+
+## Signal Configuration
+
+Signal levels are schema-driven. Each metric defines its own z-score thresholds, direction, floor, and ceiling.
+
+```yaml
+time_to_fill:
+  dtype: float64
+  direction: -1                  # lower is better
+  floor: 15
+  ceiling: 90
+  z_score_normal: 0.85
+  z_score_watch: 1.15
+  z_score_monitor: 1.96
+  z_score_inspect: 2.5
+  survival_25th: 1
+  survival_50th: 0.5
+  survival_75th: 0
+```
+
+Four schema fields each do work the others don't:
+
+**Direction** specifies whether higher or lower is operationally better. `-1` means lower is better (time-to-fill, days-to-first-screen). `1` means higher is better (percent-reviewed). `0` means neither is inherently better (applicants_total) — the deviation itself is the signal, interpreted by the operator.
+
+**Floor and ceiling** specify the operational boundaries for the metric, independent of z-scores. A value can be within the z-score normal range but still outside the operational floor. Both signals matter.
+
+**Z-score thresholds** specify the signal levels — Normal, Watch, Monitor, Inspect. Each metric can override the defaults. Days-to-first-screen uses wider thresholds because early-process variance is higher and the metric distribution is more volatile.
+
+**Survival percentiles** align with direction. For time-to-fill (lower is better), the 25th percentile is best (`1`). For percent-reviewed (higher is better), the 25th percentile is worst (`0`). Same mechanic, inverted to match the metric's direction.
+
+## What the Engine Produces
+
+This is the output for a single requisition across the context lenses that qualified for it.
+
+| Context ID | Metric | Value | Z-Score | Mean | SD |
+|------------|--------|-------|---------|------|-----|
+| org_UK_Tech_Engineering_Entry | time_to_fill | 62 | -0.92 | 68 | 7 |
+| org_UK | time_to_fill | 62 | 0.20 | 58 | 23 |
+| company_Tech_Engineering_Entry | time_to_fill | 62 | -1.48 | 74 | 8 |
+| company_Tech | time_to_fill | 62 | 0.16 | 60 | 15 |
+
+Same requisition. Same metric value. Four different signals.
+
+The most specific lenses show this requisition closed *faster* than its narrow peer group. The broader lenses show it closed roughly *on pace* with the wider population.
+
+Both are true. Both are useful.
+
+## Primary and Secondary Benchmarks
+
+Within each context group, the most specific qualifying lens is the **primary benchmark**. Broader lenses in the same group are **secondary benchmarks**.
+
+Primary benchmarks drive decisions. Secondary benchmarks provide stability and confirmation. The engine surfaces both, separated, so operators see which lens is the decision-relevant one and which are providing context.
+
+## Why Context Changes Everything
+
+Standard reporting collapses each requisition into a single comparison — usually a company-wide average. The Descriptive System refuses to collapse.
+
+Every qualifying lens produces its own signal. The composite picture across lenses is what makes the system descriptive.
+
+The engine doesn't decide which lens matters most. The operator does. The engine provides the multi-lens evidence.
+
+This is the foundation Decision Systems consume. The Air Traffic Controller composition takes descriptive output across lenses and composes it into operational recommendations. The Descriptive System sits one architectural layer below the decision-making.
+
+**Same requisition, different context lens, different signal. The entire thesis.**
