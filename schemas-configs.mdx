@@ -1,0 +1,280 @@
+---
+title: "Schemas & Configs"
+description: "The YAML that drives the engine. Schema-driven. Inspectable. Configurable."
+sidebarTitle: "Schemas & Configs"
+---
+
+Three YAML files configure the engine. Each one has a distinct job. Together they make the pipeline portable and inspectable.
+
+## dataframe.yml
+
+Pipeline configuration. Which data source, which quarter is observation vs population, which schema and cluster config to use.
+
+```yaml
+# dataframe.yml
+
+filled_req_iq_cluster_1_df:
+
+  ##### DATAFRAMES (observation & population)
+  data_source: filled_reqs
+  observations:
+    column: calendar_quarter
+    equals: "2025 Q4"
+  population:
+    column: calendar_quarter
+    not_equals: "2025 Q4"
+
+  ##### SCHEMA_SELECTION
+  schema: schema_filled_reqs
+  unique_id: requisition_id
+
+  ##### METRIC_CONFIG
+  global_metrics: core_4_metrics
+
+  ##### CLUSTER CONFIG
+  cluster_config: req_iq_cluster_1
+
+  ##### ADDITIONAL CONFIG
+  sort_by_for_top_n: requisition_filled_date
+```
+
+Each named configuration block describes one pipeline run. The block specifies:
+
+- The data source CSV to load
+- Which rows become observations and which become population
+- Which schema YAML defines the column behavior
+- Which `unique_id` identifies records uniquely
+- Which global metrics to evaluate
+- Which cluster config defines the context lenses
+- Which column to sort by when sampling `top_n`
+
+Adding a new pipeline run is adding a new named block. The orchestrator (`requisition_iq.py`) reads the block name and resolves everything else.
+
+## metric_config.yml
+
+Defines the context lens groupings and the global metric selections.
+
+```yaml
+# metric_config.yml
+
+global_metrics:
+  core_4_metrics: ["days_to_first_screen", "time_to_fill", "percent_reviewed", "percent_reviewed_in_x_days"]
+  federal_metrics: ["Total_Applications", "Number_of_Selections_Made_off_this_Job_Announcement"]
+
+req_iq_cluster_1:
+
+  recruiter_context:
+    top_n: 42
+    lineage_columns:
+      - ["recruiter", "country", "job_group", "job_family", "job_level"]
+      - ["recruiter", "country", "job_group", "job_family"]
+      - ["recruiter", "country", "job_group"]
+      - ["recruiter", "country"]
+      - ["recruiter"]
+
+  country_context:
+    top_n: 240
+    lineage_columns:
+      - ["country", "job_group", "job_family", "job_level"]
+      - ["country", "job_group", "job_family"]
+      - ["country", "job_group"]
+      - ["country"]
+
+  job_group_context:
+    top_n: 480
+    lineage_columns:
+      - ["job_group", "job_family", "job_level"]
+      - ["job_group", "job_family"]
+      - ["job_group"]
+```
+
+Two top-level sections:
+
+- **`global_metrics`** — named metric sets. Each set is a list of metrics to evaluate across all context lenses. `core_4_metrics` is the default analytical set for filled reqs.
+- **Cluster configs** like `req_iq_cluster_1` — context lens definitions. Each cluster config contains multiple context groups (`recruiter_context`, `country_context`, etc.) with their own `top_n` and hierarchical `lineage_columns`.
+
+Changing the analytical scope is changing this file. New context group? Add a new section. New metric set? Add to `global_metrics`. The pipeline picks up the changes via the `dataframe.yml` reference.
+
+## schema_filled_reqs.yml
+
+Column schema with data types, descriptions, z-score thresholds, direction, floor/ceiling.
+
+```yaml
+# schema_filled_reqs.yml
+
+columns:
+  requisition_id:
+    dtype: category
+    description: "Unique requisition identifier"
+
+  recruiter:
+    dtype: category
+    description: "Recruiter name/ID"
+
+  country:
+    dtype: category
+    description: "Country code or name"
+
+  job_group:
+    dtype: category
+    description: "Job classification group"
+
+  job_family:
+    dtype: category
+    description: "Job family classification"
+
+  job_level:
+    dtype: category
+    description: "Job level/seniority"
+
+  applicants_total:
+    dtype: int64
+    description: "Total number of applicants"
+    direction: 0
+    floor: 5
+    ceiling: 100
+    z_score_normal: 0.85
+    z_score_watch: 1.15
+    z_score_monitor: 1.96
+    z_score_inspect: 2.5
+    survival_25th: 0
+    survival_50th: 0.5
+    survival_75th: 1
+
+  percent_reviewed:
+    dtype: float32
+    description: "Percent of total applicants that have been reviewed"
+    direction: 1
+    floor: 0.50
+    ceiling: 1
+    z_score_normal: 0.85
+    z_score_watch: 1.15
+    z_score_monitor: 1.96
+    z_score_inspect: 2.5
+    survival_best: 75th
+    survival_25th: 0
+    survival_50th: 0.5
+    survival_75th: 1
+
+  percent_reviewed_in_x_days:
+    dtype: float32
+    description: "percent of applicants reviewed in X (determined by company on setup) days."
+    direction: 1
+    floor: 0.75
+    ceiling: 1
+    z_score_normal: 0.85
+    z_score_watch: 1.15
+    z_score_monitor: 1.96
+    z_score_inspect: 2.5
+    survival_best: 75th
+    survival_25th: 0
+    survival_50th: 0.5
+    survival_75th: 1
+
+  days_to_first_screen:
+    dtype: float64
+    description: "Days from open to first screening"
+    direction: -1
+    floor: 0
+    ceiling: 14
+    z_score_normal: 3
+    z_score_watch: 3.5
+    z_score_monitor: 4
+    z_score_inspect: 4.5
+    survival_25th: 1
+    survival_50th: 0.5
+    survival_75th: 0
+
+  time_to_fill:
+    dtype: float64
+    description: "Days from open to filled"
+    direction: -1
+    floor: 15
+    ceiling: 90
+    z_score_normal: 0.85
+    z_score_watch: 1.15
+    z_score_monitor: 1.96
+    z_score_inspect: 2.5
+    survival_25th: 1
+    survival_50th: 0.5
+    survival_75th: 0
+    max_metric_value: 150
+```
+
+Every column has at minimum a `dtype` and a `description`. Analytical metrics carry the full signal configuration — direction, floor, ceiling, z-score thresholds, and survival percentile structure.
+
+See [Signal System](/descriptive-systems/signal-system) for what each signal field controls.
+
+## How They Compose
+
+Reader executes the pipeline through `requisition_iq.py`. The orchestrator calls `get_dataframe_config("filled_req_iq_cluster_1_df")` which:
+
+1. Loads `dataframe.yml` and resolves the named config block
+2. Loads `metric_config.yml` to resolve `global_metrics` and `cluster_config`
+3. Loads `schema_filled_reqs.yml` to resolve schema-driven column behavior
+4. Returns a single config dict the pipeline steps consume
+
+```python
+# data_importer.py
+
+def get_dataframe_config(config_name):
+    with open("config/dataframe.yml", 'r') as f:
+        all_configs = yaml.safe_load(f)
+
+    base_data = get_base_data()
+    config = all_configs[config_name]
+    metric_config = base_data["metric_config"]
+
+    # DATAFRAMES (observation & population)
+    data = base_data[config["data_source"]]
+    observations_df = data[data[config["observations"]["column"]] == config["observations"]["equals"]]
+    population_df = data[data[config["population"]["column"]] != config["population"]["not_equals"]]
+
+    # SCHEMA_SELECTION
+    schema = base_data[config["schema"]]
+    unique_id = config["unique_id"]
+
+    # METRIC_CONFIG
+    global_metrics_selected = metric_config["global_metrics"][config["global_metrics"]]
+
+    # CLUSTER CONFIG
+    cluster_config_name = config["cluster_config"]
+    cluster_config = metric_config[cluster_config_name].items()
+    cluster_list_of_lists = get_req_iq_cluster_columns(cluster_config, cluster_config_name)
+
+    return {
+        "observations_df": observations_df,
+        "population_df": population_df,
+        "schema": schema,
+        "unique_id": unique_id,
+        "global_metrics_selected": global_metrics_selected,
+        "cluster_list_of_lists": cluster_list_of_lists,
+        "sort_by_for_top_n": config.get("sort_by_for_top_n")
+    }
+```
+
+The cluster config resolution uses a `NamedTuple` to keep the structure inspectable:
+
+```python
+ClusterConfig = namedtuple("ClusterConfig", [
+    "cluster_name",     # e.g. "req_iq_cluster_1"
+    "cluster_group",    # e.g. "recruiter_context"
+    "columns",          # e.g. ["recruiter", "country"]
+    "column_level",     # e.g. 2 — position in hierarchy
+    "config_top_n"      # e.g. 42 — per-profile top_n
+])
+```
+
+Each context lens becomes a `ClusterConfig` tuple. The pipeline iterates over the list of tuples to run each lens.
+
+## Why This Configuration Structure
+
+Three layers of YAML, each one doing a distinct job:
+
+- **`dataframe.yml`** answers *which pipeline run am I doing*
+- **`metric_config.yml`** answers *what metrics and context lenses am I evaluating*
+- **`schema_*.yml`** answers *how does each column behave*
+
+Reader can change the pipeline run without touching the metric definitions. Change the metric set without touching the schema. Tune the schema without touching the cluster definitions.
+
+The methodology stays portable because the configuration stays modular. Different organizations get different schemas. Different analyses get different metric configs. The same pipeline code runs against all of them.
